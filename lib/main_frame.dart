@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:virtual_emp/attendance_page.dart';
 import 'package:virtual_emp/emp_page.dart';
 
 class MainFrame extends StatefulWidget {
@@ -13,8 +14,8 @@ class _MainFrameState extends State<MainFrame> {
 
   final screens = [
     const EmployeePage(),
-    const Center(child: Text('Attendance')),
-    const Center(child: Text('Notifications')),
+    const AttendancePage(),
+    const Center(child: Text('No Notifications')),
   ];
 
   @override

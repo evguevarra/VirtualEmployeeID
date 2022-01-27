@@ -35,7 +35,7 @@ class _EmployeePageState extends State<EmployeePage> {
         ),
         buildEmptyPhoto(),
         const SizedBox(
-          height: 20,
+          height: 40,
         ),
         buildInfoSection(),
       ],
@@ -48,28 +48,10 @@ class _EmployeePageState extends State<EmployeePage> {
       width: MediaQuery.of(context).size.height * .10,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text('ID no: '),
-              Text(''),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text('Full name: '),
-              Text(''),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text('Position: '),
-              Text(''),
-            ],
-          ),
+        children: const [
+          Text('ID no: '),
+          Text('Full name: '),
+          Text('Position: '),
         ],
       ),
     );
