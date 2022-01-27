@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:virtual_emp/main_frame.dart';
 import 'package:virtual_emp/numeric_pad.dart';
 
 class PinVerificationPage extends StatefulWidget {
@@ -46,8 +47,8 @@ class _PinVerificationPageState extends State<PinVerificationPage> {
             padding: const EdgeInsets.only(bottom: 50),
             child: ElevatedButton(
               onPressed: () {
-                // Navigator.of(context).push(MaterialPageRoute(
-                //     builder: (context) => const PinVerificationPage()));
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const MainFrame()));
               },
               child: const Text(
                 'Submit',
