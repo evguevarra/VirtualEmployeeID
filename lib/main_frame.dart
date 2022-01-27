@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:virtual_emp/emp_page.dart';
 
 class MainFrame extends StatefulWidget {
   const MainFrame({Key? key}) : super(key: key);
@@ -11,9 +12,9 @@ class _MainFrameState extends State<MainFrame> {
   int index = 0;
 
   final screens = [
-    Center(child: Text('Employee ID')),
-    Center(child: Text('Attendance')),
-    Center(child: Text('Notifications')),
+    const EmployeePage(),
+    const Center(child: Text('Attendance')),
+    const Center(child: Text('Notifications')),
   ];
 
   @override
@@ -25,7 +26,9 @@ class _MainFrameState extends State<MainFrame> {
       ),
       body: screens[index],
       bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(indicatorColor: Colors.grey.shade400),
+        data: NavigationBarThemeData(
+          indicatorColor: Colors.grey.shade400,
+        ),
         child: NavigationBar(
           height: 60,
           selectedIndex: index,

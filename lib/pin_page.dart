@@ -72,7 +72,7 @@ class _PinVerificationPageState extends State<PinVerificationPage> {
                   code = code.substring(0, code.length - 1);
                 }
               });
-              print(code);
+              //print(code);
             },
           ),
         ],
