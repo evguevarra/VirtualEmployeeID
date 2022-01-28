@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:virtual_emp/scanner_page.dart';
 
 class AttendancePage extends StatelessWidget {
   const AttendancePage({Key? key}) : super(key: key);
@@ -10,7 +11,10 @@ class AttendancePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ScannerPage()));
+            },
             icon: const Icon(
               Icons.qr_code_scanner_sharp,
               size: 40,
