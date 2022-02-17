@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:virtual_emp/pin_page.dart';
 
 class SigninCard extends StatefulWidget {
@@ -9,10 +11,15 @@ class SigninCard extends StatefulWidget {
 }
 
 class _SigninCardState extends State<SigninCard> {
+  final GlobalKey<FormState> _key = GlobalKey<FormState>();
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  final _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<FormState> _key = GlobalKey<FormState>();
-
     return Container(
       height: MediaQuery.of(context).size.height * 0.50,
       width: MediaQuery.of(context).size.width * 0.85,
@@ -39,9 +46,21 @@ class _SigninCardState extends State<SigninCard> {
                   ],
                 ),
                 const SizedBox(
-                  height: 40,
+                  height: 20,
                 ),
                 TextFormField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Please Enter your Email Address";
+                    }
+                    if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
+                        .hasMatch(value)) {
+                      return "Please Enter a valid email";
+                    }
+                    return null;
+                  },
                   decoration: const InputDecoration(
                     hintText: 'Email Address',
                     prefixIcon: Icon(
@@ -54,6 +73,13 @@ class _SigninCardState extends State<SigninCard> {
                   height: 10,
                 ),
                 TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Please enter your password";
+                    }
+                  },
                   decoration: const InputDecoration(
                     hintText: 'Password',
                     prefixIcon: Icon(
@@ -75,15 +101,14 @@ class _SigninCardState extends State<SigninCard> {
                   ],
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 8,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const PinVerificationPage()));
+                        signIn(emailController.text, passwordController.text);
                       },
                       child: const Text(
                         'Login',
@@ -104,5 +129,19 @@ class _SigninCardState extends State<SigninCard> {
         ),
       ),
     );
+  }
+
+  Future<void> signIn(String email, String password) async {
+    if (_key.currentState!.validate()) {
+      await _auth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((uid) => {
+                Fluttertoast.showToast(msg: "Login Successful"),
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const PinVerificationPage())),
+              }).catchError((e){
+                Fluttertoast.showToast(msg: e!.message);
+              });
+    }
   }
 }

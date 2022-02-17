@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "962459506516",
+    "firebase_url": "https://employee-attendance-monitoring-default-rtdb.firebaseio.com",
+    "project_id": "employee-attendance-monitoring",
+    "storage_bucket": "employee-attendance-monitoring.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962459506516:android:81f463c2ded01bb3151ac1",
+        "android_client_info": {
+          "package_name": "com.example.virtual_emp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "962459506516-b0na8u93gfd15kvd9h4935v5q4qhdo2l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkuAobIMto-3wbCxOP0DA9ESuVSzKnTk8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "962459506516-b0na8u93gfd15kvd9h4935v5q4qhdo2l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
