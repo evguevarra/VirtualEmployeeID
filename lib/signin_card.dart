@@ -132,6 +132,7 @@ class _SigninCardState extends State<SigninCard> {
   }
 
   Future<void> signIn(String email, String password) async {
+    
     if (_key.currentState!.validate()) {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)

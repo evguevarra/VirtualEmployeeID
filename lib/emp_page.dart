@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:virtual_emp/user_model.dart';
 
 class EmployeePage extends StatefulWidget {
   const EmployeePage({Key? key}) : super(key: key);
@@ -8,6 +11,23 @@ class EmployeePage extends StatefulWidget {
 }
 
 class _EmployeePageState extends State<EmployeePage> {
+  User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser = UserModel();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      this.loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -44,14 +64,23 @@ class _EmployeePageState extends State<EmployeePage> {
 
   Widget buildInfoSection() {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * .10,
-      width: MediaQuery.of(context).size.height * .10,
+      height: MediaQuery.of(context).size.height * .20,
+      width: MediaQuery.of(context).size.height * .40,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: const [
-          Text('ID no: '),
-          Text('Full name: '),
-          Text('Position: '),
+        children: [
+          Text(
+            'ID code: \n${loggedInUser.uid}',
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            'Full name: \n${loggedInUser.firstName} ${loggedInUser.middleInitial}. ${loggedInUser.lastName}',
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            'Position: \n${loggedInUser.position}',
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
