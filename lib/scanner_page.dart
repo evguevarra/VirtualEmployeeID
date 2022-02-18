@@ -1,16 +1,26 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:io';
 
+import 'package:virtual_emp/user_model.dart';
+
 class ScannerPage extends StatefulWidget {
-  const ScannerPage({Key? key}) : super(key: key);
+
+  final String attendanceStatus;
+  const ScannerPage({Key? key, required this.attendanceStatus}) : super(key: key);
 
   @override
   _ScannerPageState createState() => _ScannerPageState();
 }
 
 class _ScannerPageState extends State<ScannerPage> {
+
+  User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser = UserModel();
+
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
   QRViewController? controller;
@@ -23,6 +33,20 @@ class _ScannerPageState extends State<ScannerPage> {
     } else if (Platform.isIOS) {
       controller!.resumeCamera();
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      this.loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
   }
 
   @override
@@ -56,6 +80,11 @@ class _ScannerPageState extends State<ScannerPage> {
     controller.scannedDataStream.listen((scanData) {
       setState(() {
         result = scanData;
+        print(loggedInUser.firstName);
+        print(loggedInUser.lastName);
+        print(loggedInUser.uid);
+        print(widget.attendanceStatus);
+        //print(loggedInUser.lastName);
       });
     });
   }

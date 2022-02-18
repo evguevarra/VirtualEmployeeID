@@ -12,8 +12,7 @@ class AttendancePage extends StatelessWidget {
         children: [
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const ScannerPage()));
+              _attendanceSelection(context);
             },
             icon: const Icon(
               Icons.qr_code_scanner_sharp,
@@ -61,4 +60,40 @@ class AttendancePage extends StatelessWidget {
       ),
     );
   }
+   _attendanceSelection(BuildContext context) {
+    showDialog(context: context, builder:(context)=> SimpleDialog(
+      title: const Text('Select Attendance Status'),
+      children: <Widget>[
+        SimpleDialogOption(
+          onPressed: (){
+            Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ScannerPage(attendanceStatus: 'Time in',)));
+          },
+          child: const Text("Time in"),
+        ),
+        SimpleDialogOption(
+          onPressed: (){
+            Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ScannerPage(attendanceStatus: 'Time out',)));
+          },
+          child: const Text("Time out"),
+        ),
+        SimpleDialogOption(
+          onPressed: (){
+            Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ScannerPage(attendanceStatus: 'Out for Lunch',)));
+          },
+          child: const Text("Out for Lunch"),
+        ),
+        SimpleDialogOption(
+          onPressed: (){
+            Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ScannerPage(attendanceStatus: 'Return from Lunch',)));
+          },
+          child: const Text("Return from Lunch"),
+        )
+      ],
+    )); 
+  }
+
 }
