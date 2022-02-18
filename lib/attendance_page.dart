@@ -78,20 +78,6 @@ class AttendancePage extends StatelessWidget {
           },
           child: const Text("Time out"),
         ),
-        SimpleDialogOption(
-          onPressed: (){
-            Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const ScannerPage(attendanceStatus: 'Out for Lunch',)));
-          },
-          child: const Text("Out for Lunch"),
-        ),
-        SimpleDialogOption(
-          onPressed: (){
-            Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const ScannerPage(attendanceStatus: 'Return from Lunch',)));
-          },
-          child: const Text("Return from Lunch"),
-        )
       ],
     )); 
   }
