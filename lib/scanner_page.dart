@@ -23,7 +23,7 @@ class _ScannerPageState extends State<ScannerPage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
 
-  final database = FirebaseDatabase.instance.ref();
+ 
 
   final String _collection = 'collectionName';
 
@@ -88,7 +88,6 @@ class _ScannerPageState extends State<ScannerPage> {
 
   Future<void> _onQRViewCreated(QRViewController controller) async {
     //final attendance = database.child('attendance');
-
     var collection = FirebaseFirestore.instance.collection('qr');
     var docSnapshot = await collection.doc('employeeQr').get();
     var qrVal;
@@ -103,7 +102,9 @@ class _ScannerPageState extends State<ScannerPage> {
     var formatter = DateFormat('yyyy-MM-dd');
     String formattedDate = formatter.format(now);
 
-    var timeformatter = DateFormat('yyyy-MM-dd - kk:mm');
+    //FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+    var timeformatter = DateFormat('kk:mm');
     String formattedTime = timeformatter.format(now);
 
     this.controller = controller;
@@ -113,23 +114,18 @@ class _ScannerPageState extends State<ScannerPage> {
         try {
           if (result!.code.toString() == qrVal) {
             if (widget.attendanceStatus == 'Time in') {
-              database
-                  .child('attendance')
-                  .child(formattedDate)
-                  .child(loggedInUser.uid.toString())
+                CollectionReference attendance = FirebaseFirestore.instance.collection(formattedDate);
+                attendance.doc(loggedInUser.uid)
                   .set({
-                "empId": loggedInUser.uid,
-                "lastName": loggedInUser.lastName,
-                "firstName": loggedInUser.firstName,
-                "timeIn": formattedTime,
-                "timeOut": '-'
-              });
+                    "empId": loggedInUser.uid,
+                    "firstName":loggedInUser.firstName,
+                    "lastName" : loggedInUser.lastName,
+                    "timeIn" : formattedTime,
+                    "timeOut" : "-",
+                  });
             } else if (widget.attendanceStatus == 'Time out') {
-              database
-                  .child('attendance')
-                  .child(formattedDate)
-                  .child(loggedInUser.uid.toString())
-                  .update({"timeOut": formattedTime});
+              CollectionReference attendance = FirebaseFirestore.instance.collection(formattedDate);
+                attendance.doc(loggedInUser.uid).update({"timeOut": formattedTime});
             }
           } else {
             Fluttertoast.showToast(msg: "Invalid Qr code!",toastLength: Toast.LENGTH_SHORT);
