@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:virtual_emp/scanner_page.dart';
+import 'package:virtual_emp/views/leave_page.dart';
+import 'package:virtual_emp/views/scanner_page.dart';
+
 
 class AttendancePage extends StatelessWidget {
   const AttendancePage({Key? key}) : super(key: key);
@@ -37,7 +39,10 @@ class AttendancePage extends StatelessWidget {
           Directionality(
             textDirection: TextDirection.rtl,
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                 Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const LeaveAbsencePage()));
+              },
               icon: const Icon(
                 Icons.border_color,
                 size: 40,

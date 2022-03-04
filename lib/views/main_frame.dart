@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:virtual_emp/attendance_page.dart';
-import 'package:virtual_emp/emp_page.dart';
+import 'package:virtual_emp/views/attendance_page.dart';
+import 'package:virtual_emp/views/emp_page.dart';
 
 class MainFrame extends StatefulWidget {
   const MainFrame({Key? key}) : super(key: key);

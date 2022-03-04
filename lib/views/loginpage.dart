@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:virtual_emp/signin_card.dart';
+import 'package:virtual_emp/views/signin_card.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key, required this.title}) : super(key: key);
@@ -22,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
         systemOverlayStyle:
             const SystemUiOverlayStyle(statusBarColor: Colors.red),
       ),
-      resizeToAvoidBottomInset: false,
+      //resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       body: Stack(
         children: <Widget>[
@@ -73,11 +74,13 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(
                   height: 40,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
-                    SigninCard(),
-                  ],
+                SingleChildScrollView(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: const [
+                      SigninCard(),
+                    ],
+                  ),
                 )
               ],
             ),

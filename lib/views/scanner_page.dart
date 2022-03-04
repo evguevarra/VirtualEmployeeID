@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:io';
 
-import 'package:virtual_emp/user_model.dart';
+import 'package:virtual_emp/model/user_model.dart';
 
 class ScannerPage extends StatefulWidget {
   final String attendanceStatus;
