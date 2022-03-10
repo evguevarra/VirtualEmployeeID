@@ -1,4 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:virtual_emp/model/user_model.dart';
 
 class AddLeaveForm extends StatefulWidget {
   const AddLeaveForm({Key? key}) : super(key: key);
@@ -8,10 +13,15 @@ class AddLeaveForm extends StatefulWidget {
 }
 
 class _AddLeaveFormState extends State<AddLeaveForm> {
+  User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser = UserModel();
+
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
 
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
+  final TextEditingController durationController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
 
   DateTime date = DateTime.now();
 
@@ -24,9 +34,48 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
     'Maternity Leave',
   ];
 
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    
+    CollectionReference leaveRequest =
+        FirebaseFirestore.instance.collection('leaves');
+
+    Future<void> addRequest() {
+      return leaveRequest
+          .add({
+            'empId': loggedInUser.uid,
+            'lastname': loggedInUser.lastName,
+            'firstname': loggedInUser.firstName,
+            'from': fromController.text,
+            'to': toController.text,
+            'duration': durationController.text,
+            'type': initialDropdownValue,
+            'description': descriptionController.text,
+            'status': 'Pending',
+          })
+          .then((value) => {
+                Fluttertoast.showToast(
+                    msg: "Request Submitted", toastLength: Toast.LENGTH_LONG)
+              })
+          .catchError((error) => {
+                Fluttertoast.showToast(
+                    msg: "Request Submission Failed; $error",
+                    toastLength: Toast.LENGTH_LONG)
+              });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Leave/Absence'),
@@ -61,7 +110,8 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
                             if (fromDate == null) return;
                             setState(() {
                               date = fromDate;
-                              fromController.text = '${date.year}/${date.month}/${date.day}';
+                              fromController.text =
+                                  '${date.year}/${date.month}/${date.day}';
                             });
                           },
                           child: TextFormField(
@@ -87,8 +137,40 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
 
                             if (toDate == null) return;
                             setState(() {
-                              date = toDate;
-                              toController.text = '${date.year}/${date.month}/${date.day}';
+                              if (fromController.text.isNotEmpty) {
+                                date = toDate;
+                                toController.text =
+                                    '${date.year}/${date.month}/${date.day}';
+
+                                DateTime fromDateParsed =
+                                    DateFormat("yyyy-MM-dd").parse(
+                                        fromController.text
+                                            .replaceAll('/', '-'));
+                                DateTime toDateParsed = DateFormat("yyyy-MM-dd")
+                                    .parse(
+                                        toController.text.replaceAll('/', '-'));
+
+                                var differenceDate = toDateParsed
+                                        .difference(fromDateParsed)
+                                        .inDays +
+                                    1;
+                                if (differenceDate > 0) {
+                                  durationController.text =
+                                      ' ${differenceDate.toString()} ${differenceDate > 1 ? " days" : "day"}';
+                                } else {
+                                  Fluttertoast.showToast(
+                                      msg:
+                                          "Invalid Date! Choose a to date that is higher than from date",
+                                      toastLength: Toast.LENGTH_LONG);
+                                  durationController.text = '';
+                                }
+                              } else {
+                                Fluttertoast.showToast(
+                                    msg:
+                                        "Error! Choose a from-date first before choosing a to-date",
+                                    toastLength: Toast.LENGTH_LONG);
+                              }
+                              //print(fromDateParsed);
                             });
                           },
                           child: TextFormField(
@@ -129,6 +211,7 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
                           height: 20,
                         ),
                         TextFormField(
+                          controller: durationController,
                           readOnly: true,
                           enabled: false,
                           decoration: const InputDecoration(
@@ -140,6 +223,7 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
                           height: 20,
                         ),
                         TextFormField(
+                          controller: descriptionController,
                           keyboardType: TextInputType.multiline,
                           maxLines: null,
                           decoration: const InputDecoration(
@@ -154,7 +238,22 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                if (fromController.text.isNotEmpty &&
+                                    toController.text.isNotEmpty &&
+                                    durationController.text.isNotEmpty &&
+                                    descriptionController.text.isNotEmpty) {
+                                  addRequest();
+                                  Navigator.pop(context);
+                                  // Fluttertoast.showToast(
+                                  //     msg: 'Saved!',
+                                  //     toastLength: Toast.LENGTH_LONG);
+                                } else {
+                                  Fluttertoast.showToast(
+                                      msg: 'Error Please Fill all blanks!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                }
+                              },
                               child: const Text(
                                 'Submit Request',
                                 style: TextStyle(color: Colors.white),
@@ -170,7 +269,9 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
                               child: const Text(
                                 'Cancel',
                                 style: TextStyle(color: Colors.white),

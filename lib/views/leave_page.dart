@@ -34,7 +34,7 @@ class _LeaveAbsencePageState extends State<LeaveAbsencePage> {
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: ElevatedButton(
                 onPressed: () {
-                   Navigator.of(context).pushReplacement(
+                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const AddLeaveForm()));
                 },
                 child: const Text(
