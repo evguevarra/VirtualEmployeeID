@@ -53,8 +53,8 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
         FirebaseFirestore.instance.collection('leaves');
 
     Future<void> addRequest() {
-      return leaveRequest
-          .add({
+      return leaveRequest.doc(loggedInUser.uid)
+          .set({
             'empId': loggedInUser.uid,
             'lastname': loggedInUser.lastName,
             'firstname': loggedInUser.firstName,
