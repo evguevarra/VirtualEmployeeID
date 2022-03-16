@@ -23,8 +23,7 @@ class _ScannerPageState extends State<ScannerPage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
 
- 
-
+  String timeInVal = '';
   final String _collection = 'collectionName';
 
   // final StreamBuilder<QuerySnapshot> qr = FirebaseFirestore.instance
@@ -75,9 +74,8 @@ class _ScannerPageState extends State<ScannerPage> {
             flex: 1,
             child: Center(
               child: (result != null)
-                  ? const Text(
-                    'Attendance Successfully recorded!')
-                      //"Barcode Type: ${describeEnum(result!.format)} Data: ${result!.code} ")
+                  ? const Text('Attendance Successfully recorded!')
+                  //"Barcode Type: ${describeEnum(result!.format)} Data: ${result!.code} ")
                   : const Text('Scan a QR code'),
             ),
           ),
@@ -114,21 +112,58 @@ class _ScannerPageState extends State<ScannerPage> {
         try {
           if (result!.code.toString() == qrVal) {
             if (widget.attendanceStatus == 'Time in') {
-                CollectionReference attendance = FirebaseFirestore.instance.collection(formattedDate);
-                attendance.doc(loggedInUser.uid)
-                  .set({
-                    "empId": loggedInUser.uid,
-                    "firstName":loggedInUser.firstName,
-                    "lastName" : loggedInUser.lastName,
-                    "timeIn" : formattedTime,
-                    "timeOut" : "-",
-                  });
+              CollectionReference attendance =
+                  FirebaseFirestore.instance.collection(formattedDate);
+
+
+              String status = '-';
+                DateTime startShiftTime =
+                    DateTime.parse(formattedDate + " 08:00:00");
+
+              if (now.isAfter(startShiftTime)) {
+                  status = 'Late';
+              } else if (now.isBefore(startShiftTime)) {
+                  status = 'On time';
+              }
+
+              attendance.doc(loggedInUser.uid).set({
+                "empId": loggedInUser.uid,
+                "firstName": loggedInUser.firstName,
+                "lastName": loggedInUser.lastName,
+                "timeIn": formattedTime,
+                "timeOut": "-",
+                "overTime": "-",
+                "underTimeStatus": "-",
+                "status": status
+              });
             } else if (widget.attendanceStatus == 'Time out') {
-              CollectionReference attendance = FirebaseFirestore.instance.collection(formattedDate);
-                attendance.doc(loggedInUser.uid).update({"timeOut": formattedTime});
+                CollectionReference attendance =
+                    FirebaseFirestore.instance.collection(formattedDate);
+
+                String diff = '-';
+                String underTimeStatus = '-';
+                DateTime endShiftTime =
+                    DateTime.parse(formattedDate + " 17:00:00");
+
+
+                if (now.isAfter(endShiftTime)) {
+                  diff = now.difference(endShiftTime).inHours.toString();
+                  underTimeStatus = 'not undertime';
+                } else if (now.isBefore(endShiftTime)) {
+                  diff = '0';
+                  underTimeStatus = 'undertime';
+                }
+
+                attendance.doc(loggedInUser.uid).update({
+                  "timeOut": formattedTime,
+                  "overTime": diff,
+                  "underTimeStatus": underTimeStatus,
+                  //"totalHours": totalTime,
+                });
             }
           } else {
-            Fluttertoast.showToast(msg: "Invalid Qr code!",toastLength: Toast.LENGTH_SHORT);
+            Fluttertoast.showToast(
+                msg: "Invalid Qr code!", toastLength: Toast.LENGTH_SHORT);
             result = null;
           }
         } catch (e) {
@@ -137,6 +172,22 @@ class _ScannerPageState extends State<ScannerPage> {
       });
     });
   }
+
+  // Future<void> _getTimeInValue() async {
+  //   var now = DateTime.now();
+  //   var formatter = DateFormat('yyyy-MM-dd');
+  //   String formattedDate = formatter.format(now);
+  //   await FirebaseFirestore.instance
+  //       .collection(formattedDate)
+  //       .doc(loggedInUser.uid)
+  //       .get()
+  //       .then((value) {
+  //         print(value.data()!['timeIn']);
+  //         // setState(() {
+  //           // timeInVal = value.data()!['timeIn'];
+  //         // });
+  //       });
+  // }
 
   Future<void> _showNoQrDialog() async {
     return showDialog<void>(
