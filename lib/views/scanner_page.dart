@@ -115,15 +115,14 @@ class _ScannerPageState extends State<ScannerPage> {
               CollectionReference attendance =
                   FirebaseFirestore.instance.collection(formattedDate);
 
-
               String status = '-';
-                DateTime startShiftTime =
-                    DateTime.parse(formattedDate + " 08:00:00");
+              DateTime startShiftTime =
+                  DateTime.parse(formattedDate + " 08:00:00");
 
               if (now.isAfter(startShiftTime)) {
-                  status = 'Late';
+                status = 'Late';
               } else if (now.isBefore(startShiftTime)) {
-                  status = 'On time';
+                status = 'On time';
               }
 
               attendance.doc(loggedInUser.uid).set({
@@ -132,34 +131,56 @@ class _ScannerPageState extends State<ScannerPage> {
                 "lastName": loggedInUser.lastName,
                 "timeIn": formattedTime,
                 "timeOut": "-",
-                "overTime": "-",
-                "underTimeStatus": "-",
-                "status": status
+              });
+
+              CollectionReference reportAttendance =
+                  FirebaseFirestore.instance.collection('attendance');
+
+              reportAttendance.doc(loggedInUser.uid).set({
+                formattedDate: {
+                  "empId": loggedInUser.uid,
+                  "firstName": loggedInUser.firstName,
+                  "lastName": loggedInUser.lastName,
+                  "timeIn": formattedTime,
+                  "timeOut": "-",
+                  "overTime": "-",
+                  "underTimeStatus": "-",
+                  "status": status
+                }
               });
             } else if (widget.attendanceStatus == 'Time out') {
-                CollectionReference attendance =
-                    FirebaseFirestore.instance.collection(formattedDate);
+              CollectionReference attendance =
+                  FirebaseFirestore.instance.collection(formattedDate);
 
-                String diff = '-';
-                String underTimeStatus = '-';
-                DateTime endShiftTime =
-                    DateTime.parse(formattedDate + " 17:00:00");
+              String diff = '-';
+              String underTimeStatus = '-';
+              DateTime endShiftTime =
+                  DateTime.parse(formattedDate + " 17:00:00");
 
+              if (now.isAfter(endShiftTime)) {
+                diff = now.difference(endShiftTime).inHours.toString();
+                underTimeStatus = 'no';
+              } else if (now.isBefore(endShiftTime)) {
+                diff = '0';
+                underTimeStatus = 'yes';
+              }
 
-                if (now.isAfter(endShiftTime)) {
-                  diff = now.difference(endShiftTime).inHours.toString();
-                  underTimeStatus = 'not undertime';
-                } else if (now.isBefore(endShiftTime)) {
-                  diff = '0';
-                  underTimeStatus = 'undertime';
-                }
+              attendance.doc(loggedInUser.uid).update({
+                "timeOut": formattedTime,
+                //"totalHours": totalTime,
+              });
 
-                attendance.doc(loggedInUser.uid).update({
+              CollectionReference reportAttendance =
+                  FirebaseFirestore.instance.collection('attendance');
+
+              reportAttendance.doc(loggedInUser.uid).set({
+                formattedDate: {
                   "timeOut": formattedTime,
                   "overTime": diff,
                   "underTimeStatus": underTimeStatus,
-                  //"totalHours": totalTime,
-                });
+                }
+              },
+              SetOptions(merge: true));
             }
           } else {
             Fluttertoast.showToast(
