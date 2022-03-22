@@ -89,18 +89,18 @@ class _SigninCardState extends State<SigninCard> {
                     ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        "Forgot Password",
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.end,
+                //   children: [
+                //     TextButton(
+                //       onPressed: () {},
+                //       child: const Text(
+                //         "Forgot Password",
+                //         style: TextStyle(color: Colors.grey, fontSize: 12),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(
                   height: 8,
                 ),

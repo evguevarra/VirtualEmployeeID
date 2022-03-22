@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:virtual_emp/views/add_leave_form.dart';
 import 'package:virtual_emp/views/leave_page.dart';
 import 'package:virtual_emp/views/scanner_page.dart';
 
@@ -41,7 +42,7 @@ class AttendancePage extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: () {
                  Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const LeaveAbsencePage()));
+                    MaterialPageRoute(builder: (context) => const AddLeaveForm()));
               },
               icon: const Icon(
                 Icons.border_color,

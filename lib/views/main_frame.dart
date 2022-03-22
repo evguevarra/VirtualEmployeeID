@@ -45,10 +45,10 @@ class _MainFrameState extends State<MainFrame> {
               icon: Icon(Icons.check_box_outlined),
               label: 'Attendance',
             ),
-            NavigationDestination(
-              icon: Icon(Icons.notifications_none),
-              label: 'Notifications',
-            ),
+            // NavigationDestination(
+            //   icon: Icon(Icons.notifications_none),
+            //   label: 'Notifications',
+            // ),
           ],
         ),
       ),
