@@ -64,23 +64,43 @@ class _EmployeePageState extends State<EmployeePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Stack(
-                  children: [
-                    Container(
+                FutureBuilder<Widget>(
+                  future: _getImage(context, loggedInUser.uid.toString()),
+                  builder: (context,snapshot){
+                    if(snapshot.connectionState == ConnectionState.done){
+                      return Container(
                       color: Colors.grey,
                       height: MediaQuery.of(context).size.height * .30,
                       width: MediaQuery.of(context).size.height * .30,
-                    ),
-                    Positioned.fill(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: (imageUrl != null)
-                            ? Image.network(imageUrl!)
-                            : const Text('Photo'),
-                      ),
-                    ),
-                  ],
-                ),
+                      child: snapshot.data,
+                    );
+                    }
+                    if(snapshot.connectionState == ConnectionState.waiting){
+                      return Container(
+                      color: Colors.grey,
+                      height: MediaQuery.of(context).size.height * .30,
+                      width: MediaQuery.of(context).size.height * .30,
+                      child: const CircularProgressIndicator(),
+                    );
+                    }if(snapshot.connectionState == ConnectionState.none || snapshot.data == null){
+                      return Container(
+                      color: Colors.grey,
+                      height: MediaQuery.of(context).size.height * .30,
+                      width: MediaQuery.of(context).size.height * .30,
+                      child: Image.network('https://www.flaticon.com/free-icon/user_1077012?related_id=1077012',fit: BoxFit.scaleDown,),
+                    );
+                    }
+                    return Container(
+                      color: Colors.grey,
+                      height: MediaQuery.of(context).size.height * .30,
+                      width: MediaQuery.of(context).size.height * .30,
+                      child: Image.network('https://www.flaticon.com/free-icon/user_1077012?related_id=1077012',fit: BoxFit.scaleDown,),
+                    );
+                    
+                  }
+                  
+                   ),
+              
               ],
             ),
             ElevatedButton(
@@ -131,6 +151,16 @@ class _EmployeePageState extends State<EmployeePage> {
     );
   }
 
+  Future<Widget> _getImage(BuildContext context, String imageName) async{
+    late Image image;
+     await FireStorageService.loadImage(context, imageName).then((value){
+      image= Image.network(value.toString(),
+      fit: BoxFit.scaleDown,
+      );
+    });
+    return image;
+  }
+
   uploadImage() async {
     CollectionReference users =
                   FirebaseFirestore.instance.collection('users');
@@ -148,19 +178,18 @@ class _EmployeePageState extends State<EmployeePage> {
       String imageLink;
       if (image != null) {
         var snapshot = await _storage.ref().child('/${loggedInUser.uid}').putFile(file);
-        var downloadURL = await snapshot.ref.getDownloadURL();
+        //var downloadURL = await snapshot.ref.getDownloadURL();
 
-        users.doc(loggedInUser.uid).update({
-          "imageLink": downloadURL,
-        });
-
-        // users.doc(loggedInUser.uid).get().then((snapshot){
-        //   imageLink=snapshot.data["imageLink"];
+        // users.doc(loggedInUser.uid).update({
+        //   "imageLink": downloadURL,
         // });
 
-        setState(() {
-          imageUrl = downloadURL;
-        });
+        
+
+        // setState(() {
+        //   var query = users.doc(loggedInUser.uid).get().then((value) => null);
+        //   imageUrl = query
+        // });
 
 
       } else {
@@ -169,5 +198,12 @@ class _EmployeePageState extends State<EmployeePage> {
     } else {
       print('try again!');
     }
+  }
+}
+
+class FireStorageService extends ChangeNotifier{
+  FireStorageService();
+  static Future<dynamic> loadImage(BuildContext context, String image)async{
+    return await FirebaseStorage.instance.ref().child(image).getDownloadURL();
   }
 }

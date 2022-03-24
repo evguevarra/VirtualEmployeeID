@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:ntp/ntp.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:io';
 
@@ -33,6 +34,7 @@ class _ScannerPageState extends State<ScannerPage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
   QRViewController? controller;
+  DateTime ntpTime = DateTime.now();
 
   @override
   void reassemble() {
@@ -56,6 +58,13 @@ class _ScannerPageState extends State<ScannerPage> {
       loggedInUser = UserModel.fromMap(value.data());
       setState(() {});
     });
+    _loadNtpTime();
+  }
+
+  void _loadNtpTime()async {
+     setState(()async {
+       ntpTime = await NTP.now();
+     });
   }
 
   @override
@@ -103,7 +112,7 @@ class _ScannerPageState extends State<ScannerPage> {
     //FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
     var timeformatter = DateFormat('kk:mm');
-    String formattedTime = timeformatter.format(now);
+    String formattedTime = timeformatter.format(ntpTime);
 
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
@@ -147,7 +156,9 @@ class _ScannerPageState extends State<ScannerPage> {
                   "underTimeStatus": "-",
                   "status": status
                 }
-              });
+              },
+              SetOptions(merge: true)
+              );
             } else if (widget.attendanceStatus == 'Time out') {
               CollectionReference attendance =
                   FirebaseFirestore.instance.collection(formattedDate);

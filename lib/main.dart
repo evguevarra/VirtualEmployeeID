@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState(){
     super.initState();
-    Notify();
+    notify();
     AwesomeNotifications().createdStream.listen((notification) { 
       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
       //   'Notification Created'
@@ -53,11 +53,11 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(title: 'Flutter Demo Home Page'),
+      home: const LoginPage(),
     );
   }
 
-  void Notify() async{
+  void notify() async{
     String timezone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
     await AwesomeNotifications().createNotification(
       content: NotificationContent(

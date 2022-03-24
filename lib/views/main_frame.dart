@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:virtual_emp/views/attendance_page.dart';
 import 'package:virtual_emp/views/emp_page.dart';
+import 'package:virtual_emp/views/loginpage.dart';
 
 class MainFrame extends StatefulWidget {
   const MainFrame({Key? key}) : super(key: key);
@@ -18,12 +19,36 @@ class _MainFrameState extends State<MainFrame> {
     const Center(child: Text('No Notifications')),
   ];
 
+   Future logoutDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Logout Confirmation'),
+              content: Text('Are you sure you want to logout?'),
+              actions: [
+                TextButton(onPressed: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const LoginPage()));
+                }, child: Text('LOGOUT')),
+                TextButton(onPressed: () {}, child: Text('CANCEL')),
+              ],
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Byaheros Express'),
         backgroundColor: Colors.red,
+        actions: [
+          IconButton(
+            onPressed: () {
+              logoutDialog(context);
+            },
+            icon: const Icon(Icons.logout),
+          )
+        ],
       ),
       body: screens[index],
       bottomNavigationBar: NavigationBarTheme(
@@ -54,4 +79,6 @@ class _MainFrameState extends State<MainFrame> {
       ),
     );
   }
+
+ 
 }
