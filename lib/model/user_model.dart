@@ -14,6 +14,7 @@ class UserModel {
   String? email;
   //String? imagelink;
   String? position;
+  String? pin;
 
   UserModel(
       {this.uid,
@@ -26,7 +27,8 @@ class UserModel {
       this.contactNumber,
       this.email,
       //this.imagelink,
-      this.position});
+      this.position,
+      this.pin});
 
   factory UserModel.fromMap(map) {
     return UserModel(
@@ -40,6 +42,7 @@ class UserModel {
       contactNumber: map['contactNumber'],
       email: map['email'],
       position: map['position'],
+      pin: map['pin'],
     );
   }
 
@@ -55,6 +58,7 @@ class UserModel {
       'contactNumber': contactNumber,
       'email': email,
       'position': position,
+      'pin': pin,
     };
   }
 }

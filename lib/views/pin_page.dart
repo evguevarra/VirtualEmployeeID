@@ -1,6 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:virtual_emp/model/user_model.dart';
 import 'package:virtual_emp/views/main_frame.dart';
 import 'package:virtual_emp/views/numeric_pad.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
 class PinVerificationPage extends StatefulWidget {
   const PinVerificationPage({Key? key}) : super(key: key);
@@ -10,7 +15,23 @@ class PinVerificationPage extends StatefulWidget {
 }
 
 class _PinVerificationPageState extends State<PinVerificationPage> {
-  String code = '';
+  User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser = UserModel();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      this.loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,10 +41,10 @@ class _PinVerificationPageState extends State<PinVerificationPage> {
         backgroundColor: Colors.red,
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           const Padding(
-            padding: EdgeInsets.only(top: 30),
+            padding: EdgeInsets.only(top: 20),
             child: Center(
               child: Text(
                 "Enter your pin",
@@ -31,79 +52,40 @@ class _PinVerificationPageState extends State<PinVerificationPage> {
               ),
             ),
           ),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                buildPinBox(code.isNotEmpty ? code.substring(0, 1) : ""),
-                buildPinBox(code.length > 1 ? code.substring(1, 2) : ""),
-                buildPinBox(code.length > 2 ? code.substring(2, 3) : ""),
-                buildPinBox(code.length > 3 ? code.substring(3, 4) : ""),
-              ],
-            ),
+          const SizedBox(
+            height: 40,
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 50),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const MainFrame()));
+            padding: const EdgeInsets.symmetric(horizontal: 60),
+            child: PinCodeTextField(
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              appContext: context,
+              length: 4,
+              onChanged: (String value) {
+                print(value);
               },
-              child: const Text(
-                'Submit',
-                style: TextStyle(color: Colors.white),
+              pinTheme: PinTheme(
+                shape: PinCodeFieldShape.box,
+                borderRadius: BorderRadius.circular(5),
+                inactiveColor: Colors.grey,
+                activeColor: Colors.black,
               ),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.red,
-                shape: const StadiumBorder(),
-                minimumSize: Size(MediaQuery.of(context).size.width * 0.30, 40),
-              ),
+              onCompleted: (value) {
+                if (value == loggedInUser.pin) {
+                  Fluttertoast.showToast(
+                      msg: "Pin Verification Successful",
+                      toastLength: Toast.LENGTH_LONG);
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const MainFrame()));
+                } else {
+                  Fluttertoast.showToast(
+                      msg: "Invalid Pin", toastLength: Toast.LENGTH_LONG);
+                }
+              },
             ),
           ),
-          NumericPad(
-            onNumberSelected: (value) {
-              setState(() {
-                if (value != -1) {
-                  if (code.length < 4) {
-                    code = code + value.toString();
-                  }
-                } else {
-                  code = code.substring(0, code.length - 1);
-                }
-              });
-              //print(code);
-            },
-          ),
         ],
-      ),
-    );
-  }
-
-  Widget buildPinBox(String code) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: SizedBox(
-        width: 60,
-        height: 60,
-        child: Container(
-          child: Column(
-            children: [
-              Center(
-                child: Text(
-                  code,
-                  style: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Container(
-                width: 60,
-                height: 5,
-                color: Colors.grey.shade400,
-              )
-            ],
-          ),
-        ),
       ),
     );
   }
