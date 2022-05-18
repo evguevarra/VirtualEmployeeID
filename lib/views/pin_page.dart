@@ -36,20 +36,27 @@ class _PinVerificationPageState extends State<PinVerificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("PIN VERIFICATION"),
+        title: (loggedInUser.pin == "")
+            ? const Text("CREATE PIN")
+            : const Text("PIN VERIFICATION"),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          const Padding(
-            padding: EdgeInsets.only(top: 20),
+          Padding(
+            padding: const EdgeInsets.only(top: 20),
             child: Center(
-              child: Text(
-                "Enter your pin",
-                style: TextStyle(fontSize: 28),
-              ),
+              child: (loggedInUser.pin == "")
+                  ? const Text(
+                      "Please set your new pin",
+                      style: TextStyle(fontSize: 28),
+                    )
+                  : const Text(
+                      "Enter your pin",
+                      style: TextStyle(fontSize: 28),
+                    ),
             ),
           ),
           const SizedBox(
@@ -72,15 +79,30 @@ class _PinVerificationPageState extends State<PinVerificationPage> {
                 activeColor: Colors.black,
               ),
               onCompleted: (value) {
-                if (value == loggedInUser.pin) {
+                if (loggedInUser.pin != "") {
+                  if (value == loggedInUser.pin) {
+                    Fluttertoast.showToast(
+                        msg: "Pin Verification Successful",
+                        toastLength: Toast.LENGTH_LONG);
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => const MainFrame()));
+                  } else {
+                    Fluttertoast.showToast(
+                        msg: "Invalid Pin", toastLength: Toast.LENGTH_LONG);
+                  }
+                } else {
+                  CollectionReference userCollection =
+                      FirebaseFirestore.instance.collection("users");
+
+                  userCollection.doc(loggedInUser.uid).update({
+                    "pin": value,
+                  });
+
                   Fluttertoast.showToast(
-                      msg: "Pin Verification Successful",
+                      msg: "Pin Creation Successful",
                       toastLength: Toast.LENGTH_LONG);
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => const MainFrame()));
-                } else {
-                  Fluttertoast.showToast(
-                      msg: "Invalid Pin", toastLength: Toast.LENGTH_LONG);
                 }
               },
             ),

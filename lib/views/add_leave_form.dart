@@ -30,12 +30,11 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
   List<String> typeItems = [
     'Sick Leave',
     'Vacation Leave',
-    'Emergenct Leave',
+    'Emergency Leave',
     'Maternity Leave',
   ];
 
   void initState() {
-    // TODO: implement initState
     super.initState();
     FirebaseFirestore.instance
         .collection("users")
@@ -53,7 +52,8 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
         FirebaseFirestore.instance.collection('leaves');
 
     Future<void> addRequest() {
-      return leaveRequest.doc(loggedInUser.uid)
+      return leaveRequest
+          .doc(loggedInUser.uid)
           .set({
             'empId': loggedInUser.uid,
             'lastname': loggedInUser.lastName,
@@ -170,7 +170,6 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
                                         "Error! Choose a from-date first before choosing a to-date",
                                     toastLength: Toast.LENGTH_LONG);
                               }
-                              //print(fromDateParsed);
                             });
                           },
                           child: TextFormField(
@@ -245,9 +244,6 @@ class _AddLeaveFormState extends State<AddLeaveForm> {
                                     descriptionController.text.isNotEmpty) {
                                   addRequest();
                                   Navigator.pop(context);
-                                  // Fluttertoast.showToast(
-                                  //     msg: 'Saved!',
-                                  //     toastLength: Toast.LENGTH_LONG);
                                 } else {
                                   Fluttertoast.showToast(
                                       msg: 'Error Please Fill all blanks!',

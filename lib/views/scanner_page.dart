@@ -10,6 +10,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:io';
 
 import 'package:virtual_emp/model/user_model.dart';
+import 'package:virtual_emp/views/attendance_page.dart';
 
 class ScannerPage extends StatefulWidget {
   final String attendanceStatus;
@@ -25,16 +26,13 @@ class _ScannerPageState extends State<ScannerPage> {
   UserModel loggedInUser = UserModel();
 
   String timeInVal = '';
-  final String _collection = 'collectionName';
-
-  // final StreamBuilder<QuerySnapshot> qr = FirebaseFirestore.instance
-  //     .collection('qr')
-  //     .snapshots() as StreamBuilder<QuerySnapshot<Object?>>;
 
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
   QRViewController? controller;
   DateTime ntpTime = DateTime.now();
+
+  late bool isQrValid;
 
   @override
   void reassemble() {
@@ -48,7 +46,6 @@ class _ScannerPageState extends State<ScannerPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     FirebaseFirestore.instance
         .collection("users")
@@ -61,15 +58,25 @@ class _ScannerPageState extends State<ScannerPage> {
     _loadNtpTime();
   }
 
-  void _loadNtpTime()async {
-     setState(()async {
-       ntpTime = await NTP.now();
-     });
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
+
+  void _loadNtpTime() async {
+    setState(() async {
+      ntpTime = await NTP.now();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Attendance Scanner"),
+        backgroundColor: Colors.red,
+      ),
       body: Column(
         children: <Widget>[
           Expanded(
@@ -83,8 +90,7 @@ class _ScannerPageState extends State<ScannerPage> {
             flex: 1,
             child: Center(
               child: (result != null)
-                  ? const Text('Attendance Successfully recorded!')
-                  //"Barcode Type: ${describeEnum(result!.format)} Data: ${result!.code} ")
+                  ? const Text('Scanning!')
                   : const Text('Scan a QR code'),
             ),
           ),
@@ -109,14 +115,12 @@ class _ScannerPageState extends State<ScannerPage> {
     var formatter = DateFormat('yyyy-MM-dd');
     String formattedDate = formatter.format(now);
 
-    //FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-
     var timeformatter = DateFormat('kk:mm');
     String formattedTime = timeformatter.format(ntpTime);
 
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
-      setState(() {
+      setState(() async {
         result = scanData;
         try {
           if (result!.code.toString() == qrVal) {
@@ -147,18 +151,14 @@ class _ScannerPageState extends State<ScannerPage> {
 
               reportAttendance.doc(loggedInUser.uid).set({
                 formattedDate: {
-                  "empId": loggedInUser.uid,
-                  "firstName": loggedInUser.firstName,
-                  "lastName": loggedInUser.lastName,
+                  "date": formattedDate,
                   "timeIn": formattedTime,
                   "timeOut": "-",
                   "overTime": "-",
                   "underTimeStatus": "-",
                   "status": status
                 }
-              },
-              SetOptions(merge: true)
-              );
+              }, SetOptions(merge: true));
             } else if (widget.attendanceStatus == 'Time out') {
               CollectionReference attendance =
                   FirebaseFirestore.instance.collection(formattedDate);
@@ -178,7 +178,6 @@ class _ScannerPageState extends State<ScannerPage> {
 
               attendance.doc(loggedInUser.uid).update({
                 "timeOut": formattedTime,
-                //"totalHours": totalTime,
               });
 
               CollectionReference reportAttendance =
@@ -190,12 +189,35 @@ class _ScannerPageState extends State<ScannerPage> {
                   "overTime": diff,
                   "underTimeStatus": underTimeStatus,
                 }
-              },
-              SetOptions(merge: true));
+              }, SetOptions(merge: true));
             }
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Attendance Recorded Successfully!'),
+                duration: const Duration(days: 365),
+                action: SnackBarAction(
+                  label: 'Dismiss',
+                  onPressed: () {},
+                ),
+              ),
+            );
+            controller.dispose();
+            Navigator.of(context).pop();
           } else {
-            Fluttertoast.showToast(
-                msg: "Invalid Qr code!", toastLength: Toast.LENGTH_SHORT);
+            isQrValid = false;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Invalid QR Code!'),
+                duration: const Duration(days: 365),
+                action: SnackBarAction(
+                  label: 'Dismiss',
+                  onPressed: () {},
+                ),
+              ),
+            );
+            controller.dispose();
+            Navigator.of(context).pop();
             result = null;
           }
         } catch (e) {
@@ -203,54 +225,5 @@ class _ScannerPageState extends State<ScannerPage> {
         }
       });
     });
-  }
-
-  // Future<void> _getTimeInValue() async {
-  //   var now = DateTime.now();
-  //   var formatter = DateFormat('yyyy-MM-dd');
-  //   String formattedDate = formatter.format(now);
-  //   await FirebaseFirestore.instance
-  //       .collection(formattedDate)
-  //       .doc(loggedInUser.uid)
-  //       .get()
-  //       .then((value) {
-  //         print(value.data()!['timeIn']);
-  //         // setState(() {
-  //           // timeInVal = value.data()!['timeIn'];
-  //         // });
-  //       });
-  // }
-
-  Future<void> _showNoQrDialog() async {
-    return showDialog<void>(
-      context: context,
-      //barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: const <Widget>[
-                Text('This Qr does not exist in the database'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    controller?.dispose();
-    super.dispose();
   }
 }

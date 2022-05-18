@@ -65,42 +65,46 @@ class _EmployeePageState extends State<EmployeePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FutureBuilder<Widget>(
-                  future: _getImage(context, loggedInUser.uid.toString()),
-                  builder: (context,snapshot){
-                    if(snapshot.connectionState == ConnectionState.done){
+                    future: _getImage(context, loggedInUser.uid.toString()),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return Container(
+                          color: Colors.grey,
+                          height: MediaQuery.of(context).size.height * .30,
+                          width: MediaQuery.of(context).size.height * .30,
+                          child: snapshot.data,
+                        );
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Container(
+                          color: Colors.grey,
+                          height: MediaQuery.of(context).size.height * .30,
+                          width: MediaQuery.of(context).size.height * .30,
+                          child: const CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.connectionState == ConnectionState.none ||
+                          snapshot.data == null) {
+                        return Container(
+                          color: Colors.grey,
+                          height: MediaQuery.of(context).size.height * .30,
+                          width: MediaQuery.of(context).size.height * .30,
+                          child: Image.network(
+                            'https://www.flaticon.com/free-icon/user_1077012?related_id=1077012',
+                            fit: BoxFit.scaleDown,
+                          ),
+                        );
+                      }
                       return Container(
-                      color: Colors.grey,
-                      height: MediaQuery.of(context).size.height * .30,
-                      width: MediaQuery.of(context).size.height * .30,
-                      child: snapshot.data,
-                    );
-                    }
-                    if(snapshot.connectionState == ConnectionState.waiting){
-                      return Container(
-                      color: Colors.grey,
-                      height: MediaQuery.of(context).size.height * .30,
-                      width: MediaQuery.of(context).size.height * .30,
-                      child: const CircularProgressIndicator(),
-                    );
-                    }if(snapshot.connectionState == ConnectionState.none || snapshot.data == null){
-                      return Container(
-                      color: Colors.grey,
-                      height: MediaQuery.of(context).size.height * .30,
-                      width: MediaQuery.of(context).size.height * .30,
-                      child: Image.network('https://www.flaticon.com/free-icon/user_1077012?related_id=1077012',fit: BoxFit.scaleDown,),
-                    );
-                    }
-                    return Container(
-                      color: Colors.grey,
-                      height: MediaQuery.of(context).size.height * .30,
-                      width: MediaQuery.of(context).size.height * .30,
-                      child: Image.network('https://www.flaticon.com/free-icon/user_1077012?related_id=1077012',fit: BoxFit.scaleDown,),
-                    );
-                    
-                  }
-                  
-                   ),
-              
+                        color: Colors.grey,
+                        height: MediaQuery.of(context).size.height * .30,
+                        width: MediaQuery.of(context).size.height * .30,
+                        child: Image.network(
+                          'https://www.flaticon.com/free-icon/user_1077012?related_id=1077012',
+                          fit: BoxFit.scaleDown,
+                        ),
+                      );
+                    }),
               ],
             ),
             ElevatedButton(
@@ -151,19 +155,19 @@ class _EmployeePageState extends State<EmployeePage> {
     );
   }
 
-  Future<Widget> _getImage(BuildContext context, String imageName) async{
+  Future<Widget> _getImage(BuildContext context, String imageName) async {
     late Image image;
-     await FireStorageService.loadImage(context, imageName).then((value){
-      image= Image.network(value.toString(),
-      fit: BoxFit.scaleDown,
+    await FireStorageService.loadImage(context, imageName).then((value) {
+      image = Image.network(
+        value.toString(),
+        fit: BoxFit.scaleDown,
       );
     });
     return image;
   }
 
   uploadImage() async {
-    CollectionReference users =
-                  FirebaseFirestore.instance.collection('users');
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
     final _storage = FirebaseStorage.instance;
     final _picker = ImagePicker();
     PickedFile image;
@@ -177,21 +181,8 @@ class _EmployeePageState extends State<EmployeePage> {
       var file = File(image!.path);
       String imageLink;
       if (image != null) {
-        var snapshot = await _storage.ref().child('/${loggedInUser.uid}').putFile(file);
-        //var downloadURL = await snapshot.ref.getDownloadURL();
-
-        // users.doc(loggedInUser.uid).update({
-        //   "imageLink": downloadURL,
-        // });
-
-        
-
-        // setState(() {
-        //   var query = users.doc(loggedInUser.uid).get().then((value) => null);
-        //   imageUrl = query
-        // });
-
-
+        var snapshot =
+            await _storage.ref().child('/${loggedInUser.uid}').putFile(file);
       } else {
         print('No path received');
       }
@@ -201,9 +192,9 @@ class _EmployeePageState extends State<EmployeePage> {
   }
 }
 
-class FireStorageService extends ChangeNotifier{
+class FireStorageService extends ChangeNotifier {
   FireStorageService();
-  static Future<dynamic> loadImage(BuildContext context, String image)async{
+  static Future<dynamic> loadImage(BuildContext context, String image) async {
     return await FirebaseStorage.instance.ref().child(image).getDownloadURL();
   }
 }

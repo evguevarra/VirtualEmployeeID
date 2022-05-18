@@ -26,7 +26,6 @@ class UserModel {
       this.address,
       this.contactNumber,
       this.email,
-      //this.imagelink,
       this.position,
       this.pin});
 

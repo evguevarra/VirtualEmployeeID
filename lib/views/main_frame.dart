@@ -19,18 +19,25 @@ class _MainFrameState extends State<MainFrame> {
     const Center(child: Text('No Notifications')),
   ];
 
-   Future logoutDialog(BuildContext context) {
+  Future logoutDialog(BuildContext context) {
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Logout Confirmation'),
-              content: Text('Are you sure you want to logout?'),
+              title: const Text('Logout Confirmation'),
+              content: const Text('Are you sure you want to logout?'),
               actions: [
-                TextButton(onPressed: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const LoginPage()));
-                }, child: Text('LOGOUT')),
-                TextButton(onPressed: () {}, child: Text('CANCEL')),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => const LoginPage()));
+                    },
+                    child: const Text('LOGOUT')),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('CANCEL'),
+                ),
               ],
             ));
   }
@@ -70,15 +77,9 @@ class _MainFrameState extends State<MainFrame> {
               icon: Icon(Icons.check_box_outlined),
               label: 'Attendance',
             ),
-            // NavigationDestination(
-            //   icon: Icon(Icons.notifications_none),
-            //   label: 'Notifications',
-            // ),
           ],
         ),
       ),
     );
   }
-
- 
 }

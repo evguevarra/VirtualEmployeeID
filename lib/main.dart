@@ -1,28 +1,28 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+import 'firebase_options.dart';
 import 'views/loginpage.dart';
+import 'package:native_notify/native_notify.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  AwesomeNotifications().initialize(
-    null,
-    [
-      NotificationChannel(
-        channelKey: 'key1',
-        channelName: 'Reminders',
-        channelDescription: 'You are running late for your work shift!',
-        defaultColor: Colors.red,
-        ledColor: Colors.white,
-        playSound: true,
-        enableLights: true,
-        enableVibration: true,
-        importance: NotificationImportance.High,
-      )
-    ]
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Notifications for Leaves/Absence Request Initialization
+  NativeNotify.initialize(645, 'aiLLSZ3ocsQs6b2jqypmjc', null);
+
+  // Late Notifier Initialization
+  AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+      channelKey: 'key1',
+      channelName: 'Byaheros Express',
+      channelDescription: 'Late Notifier',
+      playSound: true,
+    )
+  ]);
   runApp(const MyApp());
 }
 
@@ -35,20 +35,15 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
-  void initState(){
-    super.initState();
+  void initState() {
     notify();
-    AwesomeNotifications().createdStream.listen((notification) { 
-      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
-      //   'Notification Created'
-      // ),));
-    });
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Virtual ID App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -56,19 +51,17 @@ class _MyAppState extends State<MyApp> {
       home: const LoginPage(),
     );
   }
+}
 
-  void notify() async{
-    String timezone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: 1,
-        channelKey:'key1',
-        title: 'Reminders',
-        body: 'You are running late for your work shift!',
-        notificationLayout: NotificationLayout.BigPicture,
-       ),
-       schedule: NotificationCalendar(hour: 8, minute: 0,repeats: true)
-       
-       );
-  }
+void notify() async {
+  await AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      id: 1,
+      channelKey: 'key1',
+      title: 'Work Reminder',
+      body: 'You are running late! Make sure to time in on time',
+    ),
+    schedule:
+        NotificationCalendar(hour: 8, minute: 0, second: 0, repeats: true),
+  );
 }

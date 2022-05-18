@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:virtual_emp/views/pin_page.dart';
-
+import 'package:native_notify/native_notify.dart';
 
 class SigninCard extends StatefulWidget {
   const SigninCard({Key? key}) : super(key: key);
@@ -89,18 +89,6 @@ class _SigninCardState extends State<SigninCard> {
                     ),
                   ),
                 ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.end,
-                //   children: [
-                //     TextButton(
-                //       onPressed: () {},
-                //       child: const Text(
-                //         "Forgot Password",
-                //         style: TextStyle(color: Colors.grey, fontSize: 12),
-                //       ),
-                //     ),
-                //   ],
-                // ),
                 const SizedBox(
                   height: 8,
                 ),
@@ -133,17 +121,18 @@ class _SigninCardState extends State<SigninCard> {
   }
 
   Future<void> signIn(String email, String password) async {
-    
     if (_key.currentState!.validate()) {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((uid) => {
+                NativeNotify.registerIndieID(uid.user!.uid),
                 Fluttertoast.showToast(msg: "Login Successful"),
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const PinVerificationPage())),
-              }).catchError((e){
-                Fluttertoast.showToast(msg: e!.message);
-              });
+              })
+          .catchError((e) {
+        Fluttertoast.showToast(msg: e!.message);
+      });
     }
   }
 }
